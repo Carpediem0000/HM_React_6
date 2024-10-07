@@ -1,25 +1,35 @@
-import logo from './logo.svg';
+import React, { useState, useMemo, useCallback } from 'react';
+import useUsers from './useUsers';
+import SearchInput from './SearchInput';
+import UserList from './UserList';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const App = () => {
+    const [searchT, setSearchT] = useState('');
+    const { users, loading } = useUsers();
+
+    const handleSearchChange = useCallback((event) => {
+        setSearchT(event.target.value);
+    }, []);
+
+    const filteredUsers = useMemo(() => {
+        return users.filter(user =>
+            user.name.toLowerCase().includes(searchT.toLowerCase())
+        );
+    }, [users, searchT]);
+
+    return (
+        <div>
+            <h1>Search Users</h1>
+            <SearchInput searchT={searchT} onSearchChange={handleSearchChange} />
+
+            {loading ? (
+                <p>Loading users...</p>
+            ) : (
+                <UserList users={filteredUsers} />
+            )}
+        </div>
+    );
 }
 
 export default App;
